@@ -41,19 +41,13 @@ jobs:
 
       - name: Install dependencies
         if: steps.cached-venv.outputs.cache-hit != 'true'
-        run: |
-          source "${VENV}"
-          poetry install --no-interaction --no-root
+        run: make install-deps
 
       - name: Lint
-        run: |
-          source "${VENV}"
-          make lint
+        run: make lint
 
       - name: Test
-        run: |
-          source "${VENV}"
-          make test
+        run: make test
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3

@@ -1,6 +1,7 @@
 SOURCE_DIR ?= .
 TESTS_DIR ?= tests
 PYTHON ?= python3
+VENV ?= .venv/bin/activate
 
 # Based on https://tech.davis-hansson.com/p/make/
 MAKEFLAGS += --warn-undefined-variables
@@ -37,8 +38,8 @@ help:  ## print help message
 
 .PHONY: install-deps  ## install dependencies
 install-deps:
-	$(PYTHON) -m pip install poetry
-	$(PYTHON) -m poetry install --no-root
+	. $(VENV)
+	$(PYTHON) -m poetry install --no-interaction --no-root
 	$(PYTHON) -m poetry show
 
 .PHONY: update-deps  ## update requirements.txt file from poetry
@@ -66,12 +67,14 @@ requirements-dev.txt: poetry.lock
 
 .PHONY: format
 format:  ## automatically format code to standards
+	. $(VENV)
 	ruff check --fix .
 	isort .
 	black $(SOURCE_DIR) $(TESTS_DIR)
 
 .PHONY: lint
 lint:  ## lint code against standards
+	. $(VENV)
 	ruff check .
 	isort . --check --diff
 	black $(SOURCE_DIR) $(TESTS_DIR) --diff
@@ -80,5 +83,6 @@ lint:  ## lint code against standards
 .PHONY: test tests
 tests: test
 test:  ## execute unit tests
+	. $(VENV)
 	pytest $(TESTS_DIR) --cov $(SOURCE_DIR)
 
