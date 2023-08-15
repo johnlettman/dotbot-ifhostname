@@ -8,9 +8,61 @@
 [![CI Results][shield-ci]][url-ci]
 [![Code Coverage][shield-codecov]][url-codecov]
 
+A plugin for conditional execution of [Dotbot][url-dotbot] directives based on
+the hostname of the machine.
 
-[url-license]: https://github.com/johnlettman/dotbot-ifhostname/blob/main/LICENSE
+Inspired by [dotbot-if][url-dotbot-if] and [dotbot-ifplatform][url-dotbot-ifplatform].
+
+
+## Prerequisites
+This is a plugin for [Dotbot][url-dotbot], requiring it to be available.
+
+## Installation
+1. Add [dotbot-ifhostname][url-repo] as a submodule to your dotfiles repository:
+```bash
+git submodule add https://github.com/johnlettman/dotbot-ifhostname.git
+```
+
+2. Pass the CLI argument `--plugin-dir path/to/dotbot-ifhostname` when executing the `dotbot` command.
+
+## Usage
+Add the `ifhostname` directive to the [Dotbot][url-dotbot] YAML configuration file
+to conditionally execute the directives:
+```yaml
+
+- ifhostname:
+  hostname: computer-a
+  met:
+  - shell:
+    - echo on computer A!
+
+- ifhostname:
+  hostname: computer-b
+  met:
+  - shell:
+    - echo on computer B!
+  unmet:
+  - shell:
+    - echo this isn't computer B!
+
+```
+
+## Details
+The following configuration options are available for the `ifhostname` directive:
+
+| Option     | Required | Description                                             |
+|------------|----------|---------------------------------------------------------|
+| `hostname` | Yes      | The hostname to match against.                          |
+| `met`      | No       | Directives to execute when the hostname matches.        |
+| `unmet`    | No       | Directives to execute when the hostname does not match. |
+
+
+[url-dotbot]: https://github.com/anishathalye/dotbot
+[url-dotbot-if]: https://github.com/wonderbeyond/dotbot-if
+[url-dotbot-ifplatform]: https://github.com/ssbanerje/dotbot-ifplatform
+
 [url-repo]: https://github.com/johnlettman/dotbot-ifhostname
+[url-license]: https://github.com/johnlettman/dotbot-ifhostname/blob/main/LICENSE
 [url-ci]: https://github.com/johnlettman/dotbot-ifhostname/actions/workflows/ci.yml
 [url-codecov]: https://app.codecov.io/gh/johnlettman/dotbot-ifhostname
 
