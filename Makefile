@@ -39,12 +39,6 @@ help:  ## print help message
 install-deps:
 	$(PYTHON) -m pip install poetry
 	$(PYTHON) -m poetry install --no-root
-
-.PHONY: install-ci-deps  ## install dependencies under CI environment
-install-ci-deps:
-	$(PYTHON) -m pip install poetry
-	$(PYTHON) -m poetry config virtualenvs.create false
-	$(PYTHON) -m poetry install --no-root
 	$(PYTHON) -m poetry show
 
 .PHONY: update-deps  ## update requirements.txt file from poetry
@@ -88,4 +82,3 @@ tests: test
 test:  ## execute unit tests
 	$(PYTHON) -m pytest $(TESTS_DIR) --cov $(SOURCE_DIR)
 
-ci: install-ci-deps lint test  ## run continuous integration tasks
