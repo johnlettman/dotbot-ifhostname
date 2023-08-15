@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.8", "3.9", "3.10", "3.11", "pypy-3.9"]
+        python: ["3.9", "3.10", "3.11", "pypy-3.9"]
         platform: ["ubuntu-latest", "macos-latest", "windows-latest"]
 
     runs-on: ${{ matrix.platform }}
@@ -41,16 +41,18 @@ jobs:
 
       - name: Install dependencies
         if: steps.cached-venv.outputs.cache-hit != 'true'
-        run: python3 -m poetry install --no-interaction --no-root
+        run: |
+          source "${VENV}"
+          poetry install --no-interaction --no-root
 
       - name: Lint
         run: |
-          . "${VENV}"
+          source "${VENV}"
           make lint
 
       - name: Test
         run: |
-          . "${VENV}"
+          source "${VENV}"
           make test
 
       - name: Upload coverage reports to Codecov
