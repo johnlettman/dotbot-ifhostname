@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Dotbot Hostname Conditional Plugin<br>
-  <sub><sup><pre>dotbot-ifhostname</pre></sup></sub></h1>
+  <sub><sup><code>dotbot-ifhostname</code></sup></sub></h1>
 </div>
 
 [![License][shield-license]][url-license]
