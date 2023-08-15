@@ -66,19 +66,19 @@ requirements-dev.txt: poetry.lock
 
 .PHONY: format
 format:  ## automatically format code to standards
-	$(PYTHON) -m ruff check --fix .
-	$(PYTHON) -m isort .
-	$(PYTHON) -m black $(SOURCE_DIR) $(TESTS_DIR)
+	ruff check --fix .
+	isort .
+	black $(SOURCE_DIR) $(TESTS_DIR)
 
 .PHONY: lint
 lint:  ## lint code against standards
-	$(PYTHON) -m ruff check .
-	$(PYTHON) -m isort . --check --diff
-	$(PYTHON) -m black $(SOURCE_DIR) $(TESTS_DIR) --diff
-	$(PYTHON) -m mypy $(SOURCE_DIR)
+	ruff check .
+	isort . --check --diff
+	black $(SOURCE_DIR) $(TESTS_DIR) --diff
+	mypy $(SOURCE_DIR)
 
 .PHONY: test tests
 tests: test
 test:  ## execute unit tests
-	$(PYTHON) -m pytest $(TESTS_DIR) --cov $(SOURCE_DIR)
+	pytest $(TESTS_DIR) --cov $(SOURCE_DIR)
 
