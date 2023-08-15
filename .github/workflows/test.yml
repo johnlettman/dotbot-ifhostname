@@ -25,10 +25,10 @@ jobs:
           path: |
             ~/.cache/pip
             ~/.cache/pypoetry
-        key: ${{ matrix.platform }}-${{ matrix.python }}-pypoetry-${{ hashFiles('**/poetry.lock') }}
-        restore-keys: |
-          ${{ matrix.platform }}-${{ matrix.python }}-pypoetry-${{ hashFiles('**/poetry.lock') }}
-          ${{ matrix.platform }}-${{ matrix.python }}-pypoetry-
+          key: ${{ matrix.platform }}-${{ matrix.python }}-pypoetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ matrix.platform }}-${{ matrix.python }}-pypoetry-${{ hashFiles('**/poetry.lock') }}
+            ${{ matrix.platform }}-${{ matrix.python }}-pypoetry-
 
       - name: Run CI
         run: make ci
