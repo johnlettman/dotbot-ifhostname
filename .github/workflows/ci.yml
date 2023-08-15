@@ -44,10 +44,14 @@ jobs:
         run: poetry install --no-interaction --no-root
 
       - name: Lint
-        run: make lint
+        run: |
+          . "${VENV}"
+          make lint
 
       - name: Test
-        run: make test
+        run: |
+          . "${VENV}"
+          make test
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
