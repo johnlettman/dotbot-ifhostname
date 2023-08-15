@@ -1,0 +1,39 @@
+name: Test
+on: [push, pull_request]
+
+jobs:
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.8", "3.9", "3.10", "3.11", "pypy-3.9"]
+        platform: ["ubuntu-latest", "macos-latest", "windows-latest"]
+
+    runs-on: ${{ matrix.platform }}
+    name: "Test: Python ${{ matrix.python }} on ${{ matrix.platform }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Poetry cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/pypoetry
+        key: ${{ matrix.platform }}-${{ matrix.python }}-pypoetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ matrix.platform }}-${{ matrix.python }}-pypoetry-${{ hashFiles('**/poetry.lock') }}
+          ${{ matrix.platform }}-${{ matrix.python }}-pypoetry-
+
+      - name: Run CI
+        run: make ci
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
