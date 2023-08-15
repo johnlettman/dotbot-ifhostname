@@ -1,0 +1,2 @@
+dotbot @ git+https://github.com/anishathalye/dotbot.git@v1.19.2 ; python_version >= "3.8" and python_version < "4.0"
+pyyaml==5.3.1 ; python_version >= "3.8" and python_version < "4.0"
