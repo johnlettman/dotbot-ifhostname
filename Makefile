@@ -1,21 +1,28 @@
 SOURCE_DIR ?= .
 TESTS_DIR ?= tests
-ENVIRONMENT ?= dev
+PYTHON ?= python3
 
-PYTHON := python3
+# Based on https://tech.davis-hansson.com/p/make/
+MAKEFLAGS += --warn-undefined-variables
+MAKEFLAGS += --no-builtin-rules
+SHELL := bash
+.SHELLFLAGS := -eu -o pipefail -c
+.ONESHELL:
+.DEFAULT_GOAL := help
+.DELETE_ON_ERROR:
 
-# On Linux and macOS, 'which' can help us find python3.
-# On Windows (with MinGW/MSYS), 'where' is the equivalent.
-ifeq ($(OS),Windows_NT)
-  FIND_CMD := where
-  REDIRECT := 2> nul
-else
-  FIND_CMD := which
-  REDIRECT := 2> /dev/null
-endif
+# # On Linux and macOS, 'which' can help us find python3.
+# # On Windows (with MinGW/MSYS), 'where' is the equivalent.
+# ifeq ($(OS),Windows_NT)
+#   FIND_CMD := where
+#   REDIRECT := 2> nul
+# else
+#   FIND_CMD := which
+#   REDIRECT := 2> /dev/null
+# endif
 
-# Locate the python3 executable using system tools.
-DETECTED_PYTHON3 := $(shell $(FIND_CMD) python3 $(REDIRECT))
+# # Locate the python3 executable using system tools.
+# DETECTED_PYTHON3 := $(shell $(FIND_CMD) python3 $(REDIRECT))
 
 # When the python3 executable has been located,
 # update the PYTHON variable.
@@ -38,6 +45,7 @@ install-ci-deps:
 	$(PYTHON) -m pip install poetry
 	$(PYTHON) -m poetry config virtualenvs.create false
 	$(PYTHON) -m poetry install --no-root
+	$(PYTHON) -m poetry show
 
 .PHONY: update-deps  ## update requirements.txt file from poetry
 update-deps:
