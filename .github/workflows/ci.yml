@@ -41,7 +41,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cached-venv.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
+        run: python3 -m poetry install --no-interaction --no-root
 
       - name: Lint
         run: |
