@@ -41,7 +41,7 @@ class IfHostname(Plugin):
 
         if not isinstance(expected, str):
             raise ValueError(
-                f'Wrong type ({type(expected)}) on "hostname" parmeter '
+                f'Wrong type ({type(expected)}) on "hostname" parameter '
                 + 'for "ifhostname" directive'
             )
 
