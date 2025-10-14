@@ -80,6 +80,7 @@ class TestIfHostname:
 
         hostname = "helloworld.corp.network.co.uk"
         expected = "helloworld"
+        expected_list = [expected, "asdf"]
 
         monkeypatch.setattr("socket.gethostname", lambda: hostname)
 
@@ -91,6 +92,7 @@ class TestIfHostname:
             # even if "met" and "unmet" are not used
             instance.handle(instance._directive, {"hostname": "asdf"})
             instance.handle(instance._directive, {"hostname": expected})
+            instance.handle(instance._directive, {"hostname": expected_list})
 
             # it should call dispatch with "unmet" data
             # if the hostname doesn't match
@@ -106,6 +108,15 @@ class TestIfHostname:
             instance.handle(
                 instance._directive,
                 {"hostname": expected, "unmet": "unmet", "met": "met"},
+            )
+
+            dispatch.assert_called_with("met")
+
+            # it should call dispatch with "met" data
+            # if the hostname does match within a list
+            instance.handle(
+                instance._directive,
+                {"hostname": expected_list, "unmet": "unmet", "met": "met"},
             )
 
             dispatch.assert_called_with("met")

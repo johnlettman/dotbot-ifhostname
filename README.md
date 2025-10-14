@@ -45,6 +45,15 @@ to conditionally execute the directives:
   - shell:
     - echo this isn't computer B!
 
+- ifhostname:
+  hostname: [computer-b, other-computer-b]
+  met:
+  - shell:
+    - echo on computer B!
+  unmet:
+  - shell:
+    - echo this isn't computer B!
+
 ```
 
 ## Details

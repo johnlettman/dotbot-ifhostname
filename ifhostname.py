@@ -39,16 +39,25 @@ class IfHostname(Plugin):
         if not expected:
             raise ValueError('Missing "hostname" parameter for "ifhostname" directive')
 
-        if not isinstance(expected, str):
+        if not isinstance(expected, (str, list)):
             raise ValueError(
                 f'Wrong type ({type(expected)}) on "hostname" parameter '
+                + 'for "ifhostname" directive (expected type str or list of str)'
+            )
+
+        # Normalize to a list
+        expected = [expected] if isinstance(expected, str) else expected
+
+        if not all(isinstance(host, str) for host in expected):
+            raise ValueError(
+                f'All items in the "hostname" parameter must be str'
                 + 'for "ifhostname" directive'
             )
 
         if "met" not in data or "unmet" not in data:
             self._log.warning('ifhostname: "met" or "unmet" missing')
 
-        if get_hostname() == expected:
+        if get_hostname() in expected:
             return self._run_internal(data["met"]) if "met" in data else True
 
         return self._run_internal(data["unmet"]) if "unmet" in data else True
