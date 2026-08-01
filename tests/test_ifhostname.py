@@ -176,8 +176,8 @@ class TestIfHostname:
 
     def test_load_plugins_does_not_mutate_options(self, tmp_path: Path) -> None:
         context = get_fake_context(disable_builtin=True)
-        context._options.plugin_dirs = [str(tmp_path)]  # type: ignore[attr-defined]
-        context._options.plugins = ["plugin.py"]  # type: ignore[attr-defined]
+        context._options.plugin_dirs = [str(tmp_path)]
+        context._options.plugins = ["plugin.py"]
         instance = IfHostname(context)
 
         with patch("ifhostname.module.load", return_value=[]):
