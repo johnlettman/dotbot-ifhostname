@@ -1,24 +1,29 @@
-[tool.poetry]
+
+[project]
 name = "dotbot-ifhostname"
 version = "0.0.1"
-description = ""
-authors = ["John P. Lettman <the@johnlettman.com>"]
+description = "A Dotbot plugin for hostname-based conditional execution"
+authors = [{ name = "John P. Lettman", email = "the@johnlettman.com" }]
 license = "MIT"
 readme = "README.md"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "PyYAML>=6.0.3,<7.0.0",
+    "dotbot>=1.24.1,<2.0.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-PyYAML = "!=6.0.0,!=5.4.0,!=5.4.1" # solves build issue with license files
-dotbot = { git = "https://github.com/anishathalye/dotbot.git", tag = "v1.19.2"}
+[tool.poetry]
+package-mode = false
 
 [tool.poetry.group.dev.dependencies]
-black = { allow-prereleases = true, version = "*" }
-isort = "*"
-mypy = "*"
-poetry = "^1.4.2"
-pytest = "*"
-pytest-cov = "*"
-ruff = "*"
+black = "^26.5.1"
+isort = "^8.0.1"
+mypy = "^2.3.0"
+poetry = "^2.4.1"
+poetry-plugin-export = "^1.10.0"
+pytest = "^9.1.1"
+pytest-cov = "^7.1.0"
+ruff = "^0.16.1"
 
 [tool.black]
 line-length = 88

@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
 from argparse import Namespace
 from os.path import dirname
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -26,11 +26,12 @@ def get_fake_context(disable_builtin: bool = True) -> Context:
     return Context(
         dirname(__file__),
         Namespace(
-            only=False,
-            skip=False,
+            only=None,
+            skip=None,
             plugins=[],
             plugin_dirs=[],
             disable_built_in_plugins=disable_builtin,
+            dry_run=False,
         ),
     )
 
@@ -72,8 +73,11 @@ class TestIfHostname:
             instance.handle(instance._directive, {})
             assert e.match('Missing "hostname" parameter')
 
+        with pytest.raises(TypeError, match="expected a mapping"):
+            instance.handle(instance._directive, [])
+
         # it should raise when the hostname is not a str
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(TypeError) as e:
             for input_type in [1234, {}, 4.2, lambda x: x]:
                 instance.handle(instance._directive, {"hostname": input_type})
                 assert e.match("Wrong type")
@@ -121,6 +125,37 @@ class TestIfHostname:
 
             dispatch.assert_called_with("met")
 
+    def test_single_nested_task_is_dispatched(self) -> None:
+        instance = IfHostname(get_fake_context())
+
+        with patch(
+            "dotbot.dispatcher.Dispatcher.dispatch", return_value=True
+        ) as dispatch:
+            assert instance.handle(
+                instance._directive,
+                {"hostname": get_hostname(), "met": {"shell": ["true"]}},
+            )
+
+        dispatch.assert_called_once_with([{"shell": ["true"]}])
+
+    def test_link_directive_is_dispatched(self, tmp_path: Path) -> None:
+        source = tmp_path / "bashrc"
+        destination = tmp_path / ".bashrc"
+        source.write_text("# test\n")
+        instance = IfHostname(get_fake_context(disable_builtin=False))
+
+        with patch("ifhostname.get_hostname", return_value="archhome"):
+            assert instance.handle(
+                instance._directive,
+                {
+                    "hostname": "archhome",
+                    "met": [{"link": {str(destination): str(source)}}],
+                },
+            )
+
+        assert destination.is_symlink()
+        assert destination.resolve() == source
+
     def test_load_plugins(self) -> None:
         """IfHostname._load_plugins() should populate a list of user plugins."""
         # it should return an empty list if
@@ -138,3 +173,15 @@ class TestIfHostname:
         assert Create in result
         assert Link in result
         assert Shell in result
+
+    def test_load_plugins_does_not_mutate_options(self, tmp_path: Path) -> None:
+        context = get_fake_context(disable_builtin=True)
+        context._options.plugin_dirs = [str(tmp_path)]  # type: ignore[attr-defined]
+        context._options.plugins = ["plugin.py"]  # type: ignore[attr-defined]
+        instance = IfHostname(context)
+
+        with patch("ifhostname.module.load", return_value=[]):
+            instance._load_plugins()
+            instance._load_plugins()
+
+        assert context.options().plugins == ["plugin.py"]

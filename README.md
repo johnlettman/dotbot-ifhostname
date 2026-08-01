@@ -53,7 +53,19 @@ to conditionally execute the directives:
   unmet:
   - shell:
     - echo this isn't computer B!
+```
 
+`hostname` may be a string or a list of strings. A list is treated as an OR:
+the `met` directives run when the current hostname matches any item.
+
+Nested directives use the same list-of-tasks syntax as Dotbot itself. A single
+nested task may also be written as a mapping:
+```yaml
+- ifhostname:
+    hostname: computer-a
+    met:
+      link:
+        ~/.bashrc: config/shell/bashrc
 ```
 
 ## Details

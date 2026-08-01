@@ -1,6 +1,7 @@
 SOURCE_DIR ?= .
 TESTS_DIR ?= tests
 PYTHON ?= python3
+POETRY ?= poetry
 VENV ?= .venv/bin/activate
 
 # Based on https://tech.davis-hansson.com/p/make/
@@ -25,12 +26,6 @@ SHELL := bash
 # # Locate the python3 executable using system tools.
 # DETECTED_PYTHON3 := $(shell $(FIND_CMD) python3 $(REDIRECT))
 
-# When the python3 executable has been located,
-# update the PYTHON variable.
-ifneq ($(DETECTED_PYTHON3),)
-  PYTHON := $(DETECTED_PYTHON3)
-endif
-
 .PHONY: help
 help:  ## print help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -39,13 +34,13 @@ help:  ## print help message
 .PHONY: install-deps  ## install dependencies
 install-deps:
 	. $(VENV)
-	$(PYTHON) -m poetry install --no-interaction --no-root
-	$(PYTHON) -m poetry show
+	$(POETRY) install --no-interaction --no-root
+	$(POETRY) show
 
 .PHONY: update-deps  ## update requirements.txt file from poetry
 update-deps:
-	$(PYTHON) -m poetry update
-	$(PYTHON) -m poetry export \
+	$(POETRY) update
+	$(POETRY) export \
 		--format requirements.txt \
 		--output requirements.txt \
 		--without-hashes
@@ -53,17 +48,34 @@ update-deps:
 .PHONY:
 
 requirements.txt: poetry.lock
-	$(PYTHON) -m poetry export \
+	$(POETRY) export \
 		--format requirements.txt \
 		--output requirements.txt \
 		--without-hashes
 
-requirements-dev.txt: poetry.lock
-	$(PYTHON) -m poetry export \
+requirements.dev.txt: poetry.lock
+	$(POETRY) export \
 		--with dev \
 		--format requirements.txt \
 		--output requirements.dev.txt \
 		--without-hashes
+
+.PHONY: check-generated-requirements
+check-generated-requirements:
+	. $(VENV)
+	tmpdir=$$(mktemp -d)
+	trap 'rm -rf "$${tmpdir}"' EXIT
+	$(POETRY) export \
+		--format requirements.txt \
+		--output "$${tmpdir}/requirements.txt" \
+		--without-hashes
+	$(POETRY) export \
+		--with dev \
+		--format requirements.txt \
+		--output "$${tmpdir}/requirements.dev.txt" \
+		--without-hashes
+	diff --unified=0 requirements.txt "$${tmpdir}/requirements.txt"
+	diff --unified=0 requirements.dev.txt "$${tmpdir}/requirements.dev.txt"
 
 .PHONY: format
 format:  ## automatically format code to standards
@@ -85,4 +97,3 @@ tests: test
 test:  ## execute unit tests
 	. $(VENV)
 	pytest $(TESTS_DIR) --cov $(SOURCE_DIR)
-
