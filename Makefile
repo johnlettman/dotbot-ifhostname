@@ -95,4 +95,4 @@ lint:  ## lint code against standards
 tests: test
 test:  ## execute unit tests
 	. $(VENV)
-	pytest $(TESTS_DIR) --cov $(SOURCE_DIR) --cov-report=xml:coverage.xml
+	pytest $(TESTS_DIR) --cov=ifhostname --cov-report=xml:coverage.xml
