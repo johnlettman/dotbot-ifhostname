@@ -84,6 +84,12 @@ class TestIfHostname:
                 instance.handle(instance._directive, {"hostname": input_type})
                 assert e.match("Wrong type")
 
+        with pytest.raises(ValueError, match="All items.*must be str"):
+            instance.handle(
+                instance._directive,
+                {"hostname": ["valid-host", 1234]},
+            )
+
         hostname = "helloworld.corp.network.co.uk"
         expected = "helloworld"
         expected_list = [expected, "asdf"]
