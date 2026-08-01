@@ -33,7 +33,6 @@ help:  ## print help message
 
 .PHONY: install-deps  ## install dependencies
 install-deps:
-	. $(VENV)
 	$(POETRY) install --no-interaction --no-root
 	$(POETRY) show
 
