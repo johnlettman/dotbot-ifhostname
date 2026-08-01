@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import pytest
 from dotbot.context import Context
+from dotbot.dispatcher import Dispatcher
 from dotbot.plugins import Clean, Create, Link, Shell
 
 from ifhostname import IfHostname, get_hostname
@@ -22,18 +23,19 @@ def test_get_hostname(monkeypatch: pytest.MonkeyPatch) -> None:
     assert get_hostname() == expected
 
 
-def get_fake_context(disable_builtin: bool = True) -> Context:
-    return Context(
-        dirname(__file__),
-        Namespace(
-            only=None,
-            skip=None,
-            plugins=[],
-            plugin_dirs=[],
-            disable_built_in_plugins=disable_builtin,
-            dry_run=False,
-        ),
+def get_fake_options(disable_builtin: bool = True) -> Namespace:
+    return Namespace(
+        only=None,
+        skip=None,
+        plugins=[],
+        plugin_dirs=[],
+        disable_built_in_plugins=disable_builtin,
+        dry_run=False,
     )
+
+
+def get_fake_context(disable_builtin: bool = True) -> Context:
+    return Context(dirname(__file__), get_fake_options(disable_builtin))
 
 
 class TestIfHostname:
@@ -151,6 +153,51 @@ class TestIfHostname:
                     "hostname": "archhome",
                     "met": [{"link": {str(destination): str(source)}}],
                 },
+            )
+
+        assert destination.is_symlink()
+        assert destination.resolve() == source
+
+    def test_issue_19(self, tmp_path: Path) -> None:
+        dispatcher = Dispatcher(
+            str(tmp_path),
+            options=get_fake_options(disable_builtin=False),
+            plugins=[IfHostname],
+        )
+
+        with patch("ifhostname.get_hostname", return_value="second-host"):
+            assert dispatcher.dispatch(
+                [
+                    {
+                        "ifhostname": {
+                            "hostname": ["first-host", "second-host"],
+                            "met": [],
+                            "unmet": [{"shell": ["false"]}],
+                        }
+                    }
+                ]
+            )
+
+    def test_issue_21(self, tmp_path: Path) -> None:
+        source = tmp_path / "bashrc"
+        destination = tmp_path / ".bashrc"
+        source.write_text("# issue 21 regression\n")
+        dispatcher = Dispatcher(
+            str(tmp_path),
+            options=get_fake_options(disable_builtin=False),
+            plugins=[IfHostname],
+        )
+
+        with patch("ifhostname.get_hostname", return_value="archhome"):
+            assert dispatcher.dispatch(
+                [
+                    {
+                        "ifhostname": {
+                            "hostname": "archhome",
+                            "met": [{"link": {str(destination): str(source)}}],
+                        }
+                    }
+                ]
             )
 
         assert destination.is_symlink()
