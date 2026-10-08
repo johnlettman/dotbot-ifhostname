@@ -16,7 +16,7 @@ dependencies = [
 package-mode = false
 
 [tool.poetry.group.dev.dependencies]
-black = "^26.5.1"
+black = "^26.10.0"
 isort = "^9.0.1"
 mypy = "^2.3.1"
 poetry = "^2.4.3"
